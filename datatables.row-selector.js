@@ -1,4 +1,6 @@
-(function ($) {
+(function ($, document, window) {
+    'use strict';
+
     var rowSelector = function (actionOnSelection) {
 
         var _lastRow;
@@ -53,4 +55,4 @@
     };
 
     $.fn.dataTable.Api.register('rowSelector()', rowSelector);
-})(jQuery);
+})(jQuery, document, window);
