@@ -7,6 +7,34 @@
 
         var _context = this.context;
 
+        var _selectRow = function (row) {
+            row.toggleClass('selected');
+            if (actionOnSelection)
+                actionOnSelection(row);
+        }
+
+        var _selectRows = function (start, end) {
+            var innerContext = new $.fn.dataTable.Api(_context);
+            innerContext.rows(function (index) {
+                return index >= start && index <= end ? true : false;
+            }).eq(0).each(function (index) {
+                var row = $(innerContext.row(index).node())
+                if (!row.hasClass('selected'))
+                    _selectRow(row);
+            });
+        }
+
+        var _clearTextSelectionMask = function () {
+            if (window.getSelection) {
+                if (window.getSelection().empty) // Chrome
+                    window.getSelection().empty();
+                else if (window.getSelection().removeAllRanges) // Firefox
+                    window.getSelection().removeAllRanges();
+            } else if (document.selection) { // IE?
+                document.selection.empty();
+            }
+        }
+
         var _select = function (event) {
             var currentRow = $(this);
             if (!_lastRow)
@@ -21,34 +49,6 @@
             }
             _clearTextSelectionMask();
             _lastRow = currentRow;
-        }
-
-        var _selectRows = function (start, end) {
-            var innerContext = new $.fn.dataTable.Api(_context);
-            innerContext.rows(function (index) {
-                return index >= start && index <= end ? true : false;
-            }).eq(0).each(function (index) {
-                var row = $(innerContext.row(index).node())
-                if (!row.hasClass('selected'))
-                    _selectRow(row);
-            });
-        }
-
-        var _selectRow = function (row) {
-            row.toggleClass('selected');
-            if (actionOnSelection)
-                actionOnSelection(row);
-        }
-
-        var _clearTextSelectionMask = function () {
-            if (window.getSelection) {
-                if (window.getSelection().empty) // Chrome
-                    window.getSelection().empty();
-                else if (window.getSelection().removeAllRanges) // Firefox
-                    window.getSelection().removeAllRanges();
-            } else if (document.selection) { // IE?
-                document.selection.empty();
-            }
         }
 
         $(this.rows().nodes()).on("click", _select);
