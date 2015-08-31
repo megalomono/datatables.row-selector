@@ -5,7 +5,7 @@
 
         var _lastRow;
 
-        var _context = this.context;
+        var _context =  new $.fn.dataTable.Api(this.context);
 
         var _selectRow = function (row) {
             row.toggleClass('selected');
@@ -14,11 +14,10 @@
         }
 
         var _selectRows = function (start, end) {
-            var innerContext = new $.fn.dataTable.Api(_context);
-            innerContext.rows(function (index) {
-                return index >= start && index <= end ? true : false;
+            _context.rows(function (index) {
+                return index >= start && index <= end;
             }).eq(0).each(function (index) {
-                var row = $(innerContext.row(index).node())
+                var row = $(_context.row(index).node())
                 if (!row.hasClass('selected'))
                     _selectRow(row);
             });
@@ -41,8 +40,10 @@
                 _lastRow = currentRow;
 
             if (event.shiftKey && _lastRow.hasClass('selected')) {
-                var start = Math.min(currentRow.index(), _lastRow.index());
-                var end = Math.max(currentRow.index(), _lastRow.index());
+                var currentIndex = _context.rows(currentRow).eq(0)[0];
+                var lastIndex = _context.rows(_lastRow).eq(0)[0];
+                var start = Math.min(currentIndex, lastIndex);
+                var end = Math.max(currentIndex, lastIndex);
                 _selectRows(start, end);
             } else {
                 _selectRow(currentRow);
